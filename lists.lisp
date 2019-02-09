@@ -106,7 +106,7 @@
   (ext:shell (concatenate 'string "dot -Tpng -O " fname)))
 
 ;;ファイル出力
-(widh-open-file (my-stream
+(with-open-file (my-stream
 		 "testfile.txt"
 		 :direction :output
 		 :if-exists :supersede)
