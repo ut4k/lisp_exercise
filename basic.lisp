@@ -121,3 +121,125 @@
 ;;equalp
 ;;というのもある
      
+
+;;データ構造
+
+;;配列
+(make-array 3)
+
+(defparameter x (make-array 3))
+;; arefで取り出す
+(aref x 1)
+
+(setf (aref x 1) 'foo)
+
+;;setfは値を入れるときにも取り出すときにも書ける
+(setf foo (list 'a 'b 'c))
+(setf (second foo) 'z)
+
+;;setfの最初の引数は汎変数(generalized variable)と呼ばれる
+(setf (aref foo 2) (list 'x 'y 'z))
+
+;;ハッシュテーブル -- alistと似てる
+(defparameter x (make-hash-table))
+;;ハッシュテーブルの値はgethashで取り出す
+(gethash 'yup x)
+;;注)gethashは値を複数返す common lispは値を複数返せる機能がある。（リストというわけじゃない）
+;;配列と同じくsetfで値を保存できる
+(setf (gethash 'yup x) '25)
+(gethash 'yup x)
+;; 25 <-- 保存されている値
+;; T  <-- 存在したかどうか
+
+;;値を複数返す関数を自作する
+;;valuesを使う
+(defun foo()
+  (values 3 7))
+
+(+ (foo) 5)
+;;8　がかえる　つまり１つ目の値3だけが使われたということ 3+5=8
+
+;;もし２番めの値がほしいときはmultiple-value-bindを使う
+(multiple-value-bind (a b) (foo)
+  (* a b))
+;;21
+
+;;構造体
+(defstruct person
+  name
+  age
+  waist-size
+  favorite-color)
+
+;;構造体を作ると自動で make-構造体の名前の関数が使えるようになる
+;;personの場合make-person
+
+;;インスタンスもつくれる!
+(defparameter *bob* (make-person :name "Bob"
+				 :age 35
+				 :waist-size 32
+				 :favorite-color "blue"))
+
+;;構造体にアクセスするには 構造体の名前-スロットの名前の関数を使う
+;;これも自動で使えるようになる
+(person-age *bob*)
+
+;;これもまたもやsetfで構造体の値を買えられる
+(setf (person-age *bob*) 36)
+
+;;defstructしただけでインスタンス作成用の関数や、アクセス用の関数が使えるようになり非常に強力!
+
+;;-----データをジェネリックに扱う-----
+
+;;シーケンス関数はいろんなデータ型に使える
+(length '(a b c))
+(length "blub")
+(length (make-array 5))
+
+(find-if #'numberp '(a b 5 d))
+(count #\s "mississippi")
+(position #\4 "2kewl4skewl")
+(some #'numberp '(a b 5 d))
+(every #'numberp '(a b 5 d))
+
+(reduce #'+ '(3 4 6 5 2))
+
+(reduce (lambda (best item)
+	  (if (and (evenp item) (> item best))
+	      item
+	      best))
+	'(7 4 6 5 2)
+	:initial-value 0)
+
+;;reduceで要素の和を求める関数を書いてみる
+(defun sum (lst)
+  (reduce #'+ lst))
+
+(sum '(1 2 3))
+(sum (make-array 5 :initial-contents '(1 2 3 4 5)))
+;;(sum "blablabla") ;; これはエラー　文字列の加算はできない。。。
+
+
+;;mapcarと別にすべてのシーケンスに使えるmapもやっぱり用意されている
+;;mapcarはリスト専用
+(map 'list
+     (lambda (x)
+       (if (eq x #\s)
+	   #\S
+	   x))
+     "this is a string")
+
+(subseq "america" 2 6)
+
+(sort '(5 8 2 4 9 3 6) #'<)
+
+
+;;ジェネリック関数を自分で書いてみる
+
+;;arrayp, characterp, consp, functionp, hash-table-p, listp, stringp, symbolp
+;;などの型述語を使えば変数が特定のデータ型をもっているか調べられる
+
+(defun add (a b)
+  (cond ((and (numberp a) (numberp b)) (+ a b))
+	((and (listp a) (listp b)) (append a b))))
+;;この関数には問題が多い・・・
