@@ -24,7 +24,7 @@
     (cond (i1 (cons (cons (intern (string-upcase (subseq s 0 i1)))
 			  (decode-param (subseq s (1+ i1) i2)))
 		    (and i2 (parse-params (subseq s (1+ i2))))))
-	  ((eqoal s "") nil)
+	  ((equal s "") nil)
 	  (t s))))
 
 (defun parse-url (s)
@@ -53,7 +53,7 @@
 	(parse-params content)))))
 
 (defun serve (request-handler)
-  (let ((socket (socket-server 8080)))
+  (let ((socket (socket-server 8081)))
     (unwind-protect
 	 (loop (with-open-stream (stream (socket-accept socket))
 		 (let* ((url (parse-url (read-line stream)))
@@ -72,4 +72,3 @@
 	    (princ "<html><form>What is your name?<input name='name' \></form></html>")
 	    (format t "<html>Nice to meet you, ~a!</html>" (cdr name))))
       (princ "Sorry... I don't know that page.")))
-

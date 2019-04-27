@@ -166,4 +166,19 @@
   (cond ((null (caddr tree)) (announce-winner (cadr tree)))
 	((zerop (car tree)) (play-vs-computer (handle-human tree)))
 	(t (play-vs-computer (handle-computer tree)))))
+
+
+;;Memoizationして高速化する
+(let ((old-neighbors (symbol-function 'neighbors))
+      (previous (make-hash-table)))
+  (defun neighbors (pos)
+    (or (gethash pos previous)
+	(setf (gethash pos previous) (funcall old-neighbors pos)))))
+
+(let ((old-game-tree (symbol-function 'game-tree))
+      (previous (make-hash-table :test #'equalp)))
+  (defun game-tree (&rest rest)
+    (or (gethash rest previous)
+	(setf (gethash rest previous) (apply old-game-tree rest)))))
+
   
