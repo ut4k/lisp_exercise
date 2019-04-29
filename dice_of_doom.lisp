@@ -181,4 +181,35 @@
     (or (gethash rest previous)
 	(setf (gethash rest previous) (apply old-game-tree rest)))))
 
-  
+(let ((old-rate-position (symbol-function 'rate-position))
+      (previous (make-hash-table)))
+  (defun rate-position (tree player)
+    (let ((tab (gethash player previous)))
+      (unless tab
+	(setf tab (setf (gethash player previous) (make-hash-table))))
+      (or (gethash tree tab)
+	  (setf (gethash tree tab)
+		(funcall old-rate-position tree player))))))
+
+(defun add-new-dice (board player spare-dice)
+  (labels ((f (lst n acc)
+	     (cond ((zerop n) (append (reverse acc) lst))
+		   ((null lst) (reverse acc))
+		   (t (let ((cur-player (caar lst))
+			    (cur-dice (cadar lst)))
+			(if (and (eq cur-player player)
+				 (< cur-dice *max-dice*))
+			    (f (cdr lst)
+			       (1- n)
+			       (cons (list cur-player (1+ cur-dice)) acc))
+			    (f (cdr lst) n (cons (car lst) acc))))))))
+    (board-array (f (coerce board 'list) spare-dice ()))))
+
+;;再定義エラー出てコンパイルできなかった
+;; dice_of_doom.lisp:171:1:
+;;   style-warning: 
+;;     Function NEIGHBORS
+;;      was already defined in lines 67..76 
+;;   warning: 
+;;     in #:|171 176 (LET (# #) (DEFUN NEIGHBORS # ...))-24|  in lines 171..176 : Function NEIGHBORS
+;;      was already defined in lines 67..76 
