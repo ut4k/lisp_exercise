@@ -59,7 +59,7 @@
 (defun lazy-mapcan (fun lst)
   (labels ((f (lst-cur)
 	     (if (lazy-null lst-cur)
-		 (force (lazy-mapcan fun (lacy-cdr lst)))
+		 (force (lazy-mapcan fun (lazy-cdr lst)))
 		 (cons (lazy-car lst-cur) (lazy (f (lazy-cdr lst-cur)))))))
     (lazy (unless (lazy-null lst)
 	    (f (funcall fun (lazy-car lst)))))))

@@ -1,11 +1,18 @@
 (load "dice_of_doom.lisp")
 (load "lazy.lisp")
 
+(defparameter *num-players* 2)
+(fmakunbound 'first-move)
+(fmakunbound 'add-passing-move)
+(fmakunbound 'attacking-moves)
+(fmakunbound 'handle-human)
+(fmakunbound 'play-vs-human)
+
 (defparameter *board-size* 4)
 (defparameter *board-hexnum* (* *board-size* *board-size*))
 
 (defun add-passing-move (board player spare-dice first-move moves)
-  (if first-mode
+  (if first-move
       moves
       (lazy-cons (list nil
 		       (game-tree (add-new-dice board player
@@ -25,7 +32,7 @@
        (if (eq (player src) cur-player)
 	   (lazy-mapcan
 	    (lambda (dst)
-	      (if (and (not (dq (player dst)
+	      (if (and (not (eq (player dst)
 				cur-player))
 		       (> (dice src) (dice dst)))
 		  (make-lazy
@@ -69,4 +76,7 @@
       (announce-winner (cadr tree))))
 
 ;;TODO
-;;同名ファンクションをdefunしてもエラー出さない方法調査
+;;同名ファンクションをdefunしてもエラー出さない方法調査 <--- ok
+
+
+
