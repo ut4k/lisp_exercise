@@ -138,6 +138,9 @@
     (princ
      "window.setTimeout('window.location=\"game.html?chosen=NIL\"',5000)")))
 
+(defparameter *board-size* 5)
+(defparameter *board-hexnum* (* *board-size* *board-size*))
+
 (defun draw-dod-page (tree selected-tile)
   (svg *board-width*
        *board-height*
