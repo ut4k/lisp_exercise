@@ -91,11 +91,11 @@
 
 (defparameter *ai-level* 4)
 
-(defun handle-computer (tree)
-  (let ((ratings (get-rating (limit-tree-depth tree *ai-level*)
-			     (car tree))))
-    (cdr (lazy-nth (position (apply #'max ratings) ratings)
-		   (caddr tree)))))
+;;(defun handle-computer (tree)
+;;  (let ((ratings (get-rating (limit-tree-depth tree *ai-level*)
+;;			     (car tree))))
+;;    (cdr (lazy-nth (position (apply #'max ratings) ratings)
+;;		   (caddr tree)))))
 
 (defun play-vs-computer (tree)
   (print-info tree)t
@@ -112,7 +112,7 @@
 		 2)
 	     -1)))
 
-(defun threatened (pos booard)
+(defun threatened (pos board)
   (let* ((hex (aref board pos))
 	 (player (car hex))
 	 (dice (cadr hex)))
@@ -150,7 +150,7 @@
     (f (caddr tree) lower-limit)))
 
 (defun ab-get-ratings-min (tree player upper-limit lower-limit)
-  (labels ((f (move upper-limit)
+  (labels ((f (moves upper-limit)
 	     (unless (lazy-null moves)
 	       (let ((x (ab-rate-position (cadr (lazy-car moves))
 					  player
@@ -165,7 +165,7 @@
   (let ((moves (caddr tree)))
     (if (not (lazy-null moves))
 	     (if (eq (car tree) player)
-		 (apply '#max (ab-get-ratings-max tree
+		 (apply #'max (ab-get-ratings-max tree
 						  player
 						  upper-limit
 						  lower-limit))
